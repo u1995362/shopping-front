@@ -1,4 +1,4 @@
-name: Build and deploy Node.js app to Azure Web App - Shopping-list-front
+name: Build and deploy Angular app to Azure Web App - Shopping-list-front
 
 on:
   push:
@@ -16,20 +16,25 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Node.js version
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '24.16'
 
-      - name: npm install and build
+      - name: Install dependencies and build
         run: |
           npm ci
-          npm run build -- --output-path=dist
+          npm run build
+
+      - name: Prepare deployment package
+        run: |
+          cp package.json dist/llista-compra/browser/
+          cp package-lock.json dist/llista-compra/browser/
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: node-app
-          path: dist
+          name: angular-app
+          path: dist/llista-compra/browser
 
   deploy:
     runs-on: ubuntu-latest
@@ -42,8 +47,8 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: node-app
-          path: dist
+          name: angular-app
+          path: app
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -57,4 +62,5 @@ jobs:
         with:
           app-name: 'Shopping-list-front'
           slot-name: 'Production'
-          package: dist
+          package: app
+          startup-command: 'npm install --omit=dev && npx serve -s . -l tcp://0.0.0.0:${PORT:-8080}'
