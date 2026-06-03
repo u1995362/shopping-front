@@ -41,7 +41,6 @@ h1 {
 }
 
 input {
-  width: 100%;
   box-sizing: border-box;
   border: 1px solid #d1d5db;
   border-radius: 12px;
@@ -112,10 +111,15 @@ button:active {
 }
 
 .item-text {
+  width: 100%;
   display: flex;
   align-items: baseline;
   gap: 10px;
   font-size: 1rem;
+}
+
+.item-text-name {
+  width: 100%;
 }
 
 .item-text small {
